@@ -12,7 +12,7 @@ func Win_routing_reset(intf int) ([]byte, error) {
 }
 
 func Win_firewall_reset() ([]byte, error) {
-	if !common.Win32_IsAdmin() {
+	if !common.Win_IsAdmin() {
 		return []byte{}, common.MissingPrivileges{}
 	}
 

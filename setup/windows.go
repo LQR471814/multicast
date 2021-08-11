@@ -5,10 +5,11 @@ import (
 	"os"
 
 	"github.com/LQR471814/multicast/common"
+	"github.com/LQR471814/multicast/store"
 )
 
-func Win32(intf int) error {
-	if !common.Win32_IsAdmin() {
+func Win(intf int) error {
+	if !common.Win_IsAdmin() {
 		return common.MissingPrivileges{}
 	}
 
@@ -30,6 +31,10 @@ func Win32(intf int) error {
 	}
 
 	log.Default().Println(string(out))
+
+	store.UpdateStore(store.Store{
+		Interface: int64(intf),
+	})
 
 	return nil
 }

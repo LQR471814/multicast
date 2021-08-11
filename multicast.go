@@ -9,14 +9,13 @@ import (
 	"github.com/LQR471814/multicast/operations"
 	"github.com/LQR471814/multicast/reset"
 	"github.com/LQR471814/multicast/setup"
+	"github.com/LQR471814/multicast/store"
 )
 
-var store *Store
-
 func init() {
-	store = &Store{}
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	err := LoadStore(store)
+	err := store.LoadStore()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -46,7 +45,7 @@ func Listen(handler func(operations.MulticastPacket)) error {
 		return common.SetupRequired{}
 	}
 
-	err = operations.Listen(int(store.Interface), handler)
+	err = operations.Listen(int(store.Current().Interface), handler)
 	return err
 }
 
@@ -55,7 +54,7 @@ func Check() (bool, error) {
 	var err error
 
 	ctx := checks.RuleContext{
-		Interface: store.Interface,
+		Interface: store.Current().Interface,
 	}
 
 	switch runtime.GOOS {
@@ -69,7 +68,7 @@ func Check() (bool, error) {
 func Setup(intf int) error {
 	switch runtime.GOOS {
 	case "windows":
-		return setup.Win32(intf)
+		return setup.Win(intf)
 	}
 
 	return nil
@@ -78,7 +77,7 @@ func Setup(intf int) error {
 func Reset(intf int) error {
 	switch runtime.GOOS {
 	case "windows":
-		return reset.Win32(intf)
+		return reset.Win(intf)
 	}
 
 	return nil

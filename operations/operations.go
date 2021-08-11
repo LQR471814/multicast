@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net"
+	"os"
 	"time"
 
 	"github.com/LQR471814/multicast/common"
@@ -42,8 +43,10 @@ func listener(handler func(MulticastPacket)) {
 			conn.SetReadDeadline(time.Now().Add(1 * time.Second))
 
 			n, src, err := conn.ReadFromUDP(buf)
-			if err != nil {
-				cancel() //? Kind of unnecessary but it's here cause it looks nice anyway
+			if os.IsTimeout(err) {
+				continue
+			} else if err != nil {
+				cancel()
 				return
 			}
 
@@ -77,4 +80,12 @@ func Ping(buf []byte) error {
 	}
 
 	return nil
+}
+
+func Context() context.Context {
+	return ctx
+}
+
+func Cancel() {
+	cancel()
 }

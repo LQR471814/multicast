@@ -6,7 +6,7 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-func Win32_IsAdmin() bool {
+func Win_IsAdmin() bool {
 	var sid *windows.SID
 	err := windows.AllocateAndInitializeSid(
 		&windows.SECURITY_NT_AUTHORITY,

@@ -14,10 +14,14 @@ import (
 
 func main() {
     setup, err := multicast.Check()
+    if err != nil {
+        fmt.Println(err.Error())
+    }
+
     if setup {
         multicast.Setup(7)
 
-        multicast.Listen(func(packet) {
+        multicast.Listen(func(packet multicast.MulticastPacket) {
             fmt.Println(packet)
         })
 

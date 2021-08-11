@@ -1,6 +1,6 @@
 package reset
 
-func Win32(intf int) error {
+func Win(intf int) error {
 	_, err := Win_routing_reset(intf)
 	if err != nil {
 		return err

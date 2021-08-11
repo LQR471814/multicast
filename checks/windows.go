@@ -6,6 +6,14 @@ import (
 	"strings"
 )
 
+func win_command_failed(err error) bool {
+	if err != nil && err.Error() == "exit status 1" {
+		return true
+	}
+
+	return false
+}
+
 func win_firewall_check(ctx RuleContext) (bool, error) {
 	err := exec.Command(
 		"powershell.exe",
@@ -13,7 +21,13 @@ func win_firewall_check(ctx RuleContext) (bool, error) {
 		"-DisplayName \"FTX\"",
 	).Run()
 
-	return err == nil, err
+	if win_command_failed(err) {
+		return false, nil
+	} else if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 func win_routing_check(ctx RuleContext) (bool, error) {
@@ -26,6 +40,10 @@ func win_routing_check(ctx RuleContext) (bool, error) {
 			10,
 		),
 	).Output()
+
+	if win_command_failed(err) {
+		return false, nil
+	}
 
 	lines := []string{}
 	for _, line := range strings.Split(string(out), "\r\n") {
@@ -40,5 +58,5 @@ func win_routing_check(ctx RuleContext) (bool, error) {
 		}
 	}
 
-	return true, err
+	return true, nil
 }

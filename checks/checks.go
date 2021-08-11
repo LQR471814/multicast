@@ -21,6 +21,9 @@ func all(ctx RuleContext, rules []Rule) (bool, error) {
 
 	for _, rule := range rules {
 		result, err = rule(ctx)
+		if !result {
+			return false, err
+		}
 	}
 
 	return result, err

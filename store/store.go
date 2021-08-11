@@ -1,4 +1,4 @@
-package multicast
+package store
 
 import (
 	"encoding/json"
@@ -14,29 +14,45 @@ type Store struct {
 	Interface int64
 }
 
+var store = &Store{}
+
+func Current() Store {
+	return *store
+}
+
 func DefaultStore() Store {
 	return Store{
 		Interface: -1,
 	}
 }
 
-func LoadStore(store *Store) error {
+func UpdateStore(newStore Store) {
+	*store = newStore
+	WriteStore()
+}
+
+func LoadStore() error {
 	path, err := os.UserConfigDir()
 	if err != nil {
 		return err
 	}
 
 	data, err := os.ReadFile(fmt.Sprintf("%v\\%v", path, StoreFilename))
-	if err != nil {
-		*store = DefaultStore()
+	if os.IsNotExist(err) {
+		UpdateStore(DefaultStore())
+	} else if err != nil {
 		return err
+	} else {
+		err = json.Unmarshal(data, store)
+		if err != nil {
+			return err
+		}
 	}
 
-	err = json.Unmarshal(data, store)
-	return err
+	return nil
 }
 
-func WriteStore(store *Store) error {
+func WriteStore() error {
 	path, err := os.UserConfigDir()
 	if err != nil {
 		return err
