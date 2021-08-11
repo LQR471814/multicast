@@ -1,9 +1,10 @@
 package reset
 
 import (
-	"multicast/common"
-	"multicast/setup"
 	"os/exec"
+
+	"github.com/LQR471814/multicast/common"
+	"github.com/LQR471814/multicast/setup"
 )
 
 func Win_routing_reset(intf int) ([]byte, error) {

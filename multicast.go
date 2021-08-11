@@ -4,11 +4,11 @@ import (
 	"log"
 	"runtime"
 
-	"multicast/checks"
-	"multicast/common"
-	"multicast/operations"
-	"multicast/reset"
-	"multicast/setup"
+	"github.com/LQR471814/multicast/checks"
+	"github.com/LQR471814/multicast/common"
+	"github.com/LQR471814/multicast/operations"
+	"github.com/LQR471814/multicast/reset"
+	"github.com/LQR471814/multicast/setup"
 )
 
 var store *Store
@@ -36,7 +36,7 @@ func Ping(buf []byte) error {
 	return err
 }
 
-func Listen(intf int, handler func(operations.MulticastPacket)) error {
+func Listen(handler func(operations.MulticastPacket)) error {
 	listenable, err := Check()
 	if err != nil {
 		return err
@@ -46,7 +46,7 @@ func Listen(intf int, handler func(operations.MulticastPacket)) error {
 		return common.SetupRequired{}
 	}
 
-	err = operations.Listen(intf, handler)
+	err = operations.Listen(int(store.Interface), handler)
 	return err
 }
 

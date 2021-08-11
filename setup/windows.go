@@ -2,8 +2,9 @@ package setup
 
 import (
 	"log"
-	"multicast/common"
 	"os"
+
+	"github.com/LQR471814/multicast/common"
 )
 
 func Win32(intf int) error {

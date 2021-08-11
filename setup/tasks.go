@@ -4,7 +4,7 @@ import (
 	"os/exec"
 	"strconv"
 
-	"multicast/common"
+	"github.com/LQR471814/multicast/common"
 )
 
 func Win_routing_cfg(intf, metric int) ([]byte, error) {

@@ -1,4 +1,4 @@
-module multicast
+module github.com/LQR471814/multicast
 
 go 1.16
 
