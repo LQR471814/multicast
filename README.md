@@ -9,23 +9,33 @@ package main
 
 import (
     "fmt"
+
     "github.com/LQR471814/multicast"
+    operations "github.com/LQR471814/multicast/operations"
 )
 
 func main() {
+    fmt.Println("Built")
+
     setup, err := multicast.Check()
     if err != nil {
         fmt.Println(err.Error())
     }
 
-    if setup {
+    if !setup {
         multicast.Setup(7)
+    }
 
-        multicast.Listen(func(packet multicast.MulticastPacket) {
+    if setup {
+        multicast.Listen(func(packet operations.MulticastPacket) {
             fmt.Println(packet)
         })
 
         multicast.Ping([]byte("Hello world!"))
+    }
+
+    if setup {
+        <-operations.Context().Done()
     }
 }
 ```
