@@ -3,7 +3,6 @@ package store
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/kirsle/configdir"
@@ -39,7 +38,6 @@ func LoadStore() error {
 
 	data, err := os.ReadFile(fmt.Sprintf("%v\\%v", path, StoreFilename))
 	if os.IsNotExist(err) {
-		log.Println(err, string(data))
 		UpdateStore(DefaultStore())
 	} else if err != nil {
 		return err
@@ -49,8 +47,6 @@ func LoadStore() error {
 			return err
 		}
 	}
-
-	log.Println("Read", *store)
 
 	return nil
 }
@@ -74,10 +70,6 @@ func WriteStore() error {
 
 	f.Write(data)
 	f.Sync()
-
-	log.Println("Wrote", string(data), "to", configDir)
-
-	log.Println(*store)
 
 	return err
 }
