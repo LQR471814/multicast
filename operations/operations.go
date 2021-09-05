@@ -2,7 +2,6 @@ package operations
 
 import (
 	"context"
-	"log"
 	"net"
 	"os"
 	"time"
@@ -11,7 +10,6 @@ import (
 )
 
 var conn = &net.UDPConn{}
-var group *net.UDPAddr
 
 var ctx context.Context
 var cancel context.CancelFunc
@@ -23,13 +21,6 @@ type MulticastPacket struct {
 }
 
 func init() {
-	var err error
-
-	group, err = net.ResolveUDPAddr("udp", common.MULTICAST_GROUP)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	ctx, cancel = context.WithCancel(context.Background())
 }
 
@@ -59,21 +50,28 @@ func listener(handler func(MulticastPacket)) {
 	}
 }
 
-func Listen(intf int, handler func(MulticastPacket)) error {
-	var err error
-
+func Listen(group *net.UDPAddr, intf int, handler func(MulticastPacket)) error {
 	networkInterface, err := net.InterfaceByIndex(intf)
 	if err != nil {
 		return err
 	}
 
 	conn, err = net.ListenMulticastUDP("udp4", networkInterface, group)
+	if conn == nil {
+		return common.BrokenInterfaceError{}
+	}
+
+	conn.SetReadBuffer(common.BUFFER)
 	go listener(handler)
 
 	return err
 }
 
-func Ping(buf []byte) error {
+func Ping(group *net.UDPAddr, buf []byte) error {
+	if conn == nil {
+		return common.BrokenInterfaceError{}
+	}
+
 	_, err := conn.WriteToUDP(buf, group)
 	if err != nil {
 		return err

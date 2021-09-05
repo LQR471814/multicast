@@ -2,6 +2,7 @@ package multicast
 
 import (
 	"log"
+	"net"
 	"runtime"
 
 	"github.com/LQR471814/multicast/checks"
@@ -13,15 +14,13 @@ import (
 )
 
 func init() {
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
-
 	err := store.LoadStore()
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func Ping(buf []byte) error {
+func Ping(group *net.UDPAddr, buf []byte) error {
 	pingable, err := Check()
 	if err != nil {
 		return err
@@ -31,11 +30,11 @@ func Ping(buf []byte) error {
 		return common.SetupRequired{}
 	}
 
-	err = operations.Ping(buf)
+	err = operations.Ping(group, buf)
 	return err
 }
 
-func Listen(handler func(operations.MulticastPacket)) error {
+func Listen(group *net.UDPAddr, handler func(operations.MulticastPacket)) error {
 	listenable, err := Check()
 	if err != nil {
 		return err
@@ -45,11 +44,11 @@ func Listen(handler func(operations.MulticastPacket)) error {
 		return common.SetupRequired{}
 	}
 
-	err = operations.Listen(int(store.Current().Interface), handler)
+	err = operations.Listen(group, int(store.Current().Interface), handler)
 	return err
 }
 
-func Check() (bool, error) {
+func Check() (bool, error) { //? Returns false if setup is required
 	var result bool
 	var err error
 

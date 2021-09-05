@@ -7,9 +7,7 @@ type RuleContext struct {
 type Rule = func(RuleContext) (bool, error)
 
 func Check_Win(ctx RuleContext) (bool, error) {
-	return all(ctx, []Rule{
-		interface_store_check,
-
+	return all(ctx, []Rule{ //? Returns true if all rules pass
 		win_firewall_check,
 		win_routing_check,
 	})

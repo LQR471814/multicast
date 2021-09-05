@@ -2,4 +2,7 @@ module github.com/LQR471814/multicast
 
 go 1.16
 
-require golang.org/x/sys v0.0.0-20210806184541-e5e7981a1069
+require (
+	github.com/kirsle/configdir v0.0.0-20170128060238-e45d2f54772f
+	golang.org/x/sys v0.0.0-20210903071746-97244b99971b
+)

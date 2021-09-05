@@ -15,28 +15,41 @@ import (
 )
 
 func main() {
-    fmt.Println("Built")
-
-    setup, err := multicast.Check()
+    //? Check if multicast works
+    multicastWorks, err := multicast.Check()
     if err != nil {
-        fmt.Println(err.Error())
+        log.Fatal(err)
     }
 
-    if !setup {
-        multicast.Setup(7)
+    if !multicastWorks {
+        log.Fatal("Setup should be run first to continue")
+        return
     }
 
-    if setup {
-        multicast.Listen(func(packet operations.MulticastPacket) {
-            fmt.Println(packet)
-        })
-
-        multicast.Ping([]byte("Hello world!"))
+    //? Get group addr struct
+    group, err := net.ResolveUDPAddr("udp", "224.0.0.1:5001")
+    if err != nil {
+        log.Fatal(err)
     }
 
-    if setup {
-        <-operations.Context().Done()
+    //? Listen for packet
+    err = multicast.Listen(group, func(packet operations.MulticastPacket) {
+        log.Println(string(packet.Contents))
+    })
+    if err != nil {
+        log.Fatal(err.Error())
     }
+
+    //? Send to group
+    err = multicast.Ping(group, []byte("Hello world!"))
+    if err != nil {
+        log.Fatal(err.Error())
+        return
+    }
+
+    //? Wait
+    log.Println("Waiting...")
+    <-operations.Context().Done()
 }
 ```
 
@@ -57,14 +70,14 @@ However it can also be found by trying every interface to find which one(s) are 
 
 Sets up multicasting on the system, on most systems this will require elevated privileges
 
-#### `Ping(buf []byte) error`
+#### `Ping(group *net.UDPAddr, buf []byte) error`
 
 **Parameter**
 `buf` is a byte slice to be broadcasted to the multicast group
 
 Sends a message to the default multicast group
 
-#### `Listen(handler func(operations.MulticastPacket)) error`
+#### `Listen(group *net.UDPAddr, handler func(operations.MulticastPacket)) error`
 
 **Parameter**
 `handler` is called for every packet received from the default multicast group

@@ -43,20 +43,22 @@ func win_routing_check(ctx RuleContext) (bool, error) {
 
 	if win_command_failed(err) {
 		return false, nil
+	} else if err != nil {
+		return false, err
 	}
 
 	lines := []string{}
-	for _, line := range strings.Split(string(out), "\r\n") {
-		if strings.Contains(line, "224.0.0.0") {
-			lines = append(lines, line)
+	for _, ln := range strings.Split(string(out), "\r\n") {
+		if strings.Contains(ln, "224.0.0.0") {
+			lines = append(lines, ln)
 		}
 	}
 
-	for i := 0; i < len(lines); i++ {
-		if strings.Fields(lines[i])[3] != "256" {
-			return false, err
+	for _, ln := range lines {
+		if strings.Fields(ln)[3] != lines[0] {
+			return true, nil
 		}
 	}
 
-	return true, nil
+	return false, nil
 }
