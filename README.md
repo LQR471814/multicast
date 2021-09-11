@@ -53,11 +53,33 @@ func main() {
 }
 ```
 
+### Setup Api
+
+```go
+package setup
+
+import (
+    "log"
+
+    "github.com/LQR471814/multicast"
+)
+
+func main() {
+    err := multicast.Setup(23)
+
+    if err != nil {
+        log.Fatal(err)
+    }
+}
+```
+
 ### Methods
 
 #### `Check() (bool, error)`
 
 Checks the operating system and the necessary setup steps required for multicasting to function on it.
+
+The boolean returned will be false if setup is required.
 
 **Returns**
 a boolean which will be `true` if the system is ready for multicasting, if the system isn't supported or if it isn't ready for multicasting it will return `false`

@@ -1,13 +1,11 @@
 package setup
 
 import (
-	"os"
-
 	"github.com/LQR471814/multicast/common"
 	"github.com/LQR471814/multicast/store"
 )
 
-func Win(intf int) error {
+func Win(exec string, intf int) error {
 	if !common.Win_IsAdmin() {
 		return common.MissingPrivileges{}
 	}
@@ -17,12 +15,7 @@ func Win(intf int) error {
 		return err
 	}
 
-	path, err := os.Executable()
-	if err != nil {
-		return err
-	}
-
-	_, err = Win_firewall_setup(path)
+	_, err = Win_firewall_setup(exec)
 	if err != nil {
 		return err
 	}

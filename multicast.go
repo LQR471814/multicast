@@ -64,19 +64,19 @@ func Check() (bool, error) { //? Returns false if setup is required
 	return result, err
 }
 
-func Setup(intf int) error {
+func Setup(exec string, intf int) error {
 	switch runtime.GOOS {
 	case "windows":
-		return setup.Win(intf)
+		return setup.Win(exec, intf)
 	}
 
 	return nil
 }
 
-func Reset(intf int) error {
+func Reset() error {
 	switch runtime.GOOS {
 	case "windows":
-		return reset.Win(intf)
+		return reset.Win(int(store.Current().Interface))
 	}
 
 	return nil
