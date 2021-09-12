@@ -5,81 +5,81 @@
 ### Usage
 
 <details>
-    <summary>Setup</summary>
+<summary>Setup</summary>
 
-    ```go
-    package main
+```go
+package main
 
-    import (
-        "log"
-        "flag"
+import (
+    "log"
+    "flag"
 
-        "github.com/LQR471814/multicast"
-    )
+    "github.com/LQR471814/multicast"
+)
 
-    func main() {
-        reset := flag.Bool("Reset", false, "Should multicasting setup be reset")
-        exec := flag.String("Path", "", "The path of the executable that should be allowed to multicast")
-        intf := flag.Int("Interface", 0, "Pass the interface index to use during setup")
+func main() {
+    reset := flag.Bool("Reset", false, "Should multicasting setup be reset")
+    exec := flag.String("Path", "", "The path of the executable that should be allowed to multicast")
+    intf := flag.Int("Interface", 0, "Pass the interface index to use during setup")
 
-        flag.Parse()
+    flag.Parse()
 
-        if *reset {
-            err := multicast.Reset()
-            if err != nil {
-                log.Fatal(err)
-            }
-
-            return
-        }
-
-        err := multicast.Setup(*exec, *intf)
+    if *reset {
+        err := multicast.Reset()
         if err != nil {
             log.Fatal(err)
         }
+
+        return
     }
-    ```
+
+    err := multicast.Setup(*exec, *intf)
+    if err != nil {
+        log.Fatal(err)
+    }
+}
+```
 </details>
 
 <details>
-    <summary>Methods</summary>
+<summary>Methods</summary>
 
-    ```go
-    package main
+```go
+package main
 
-    import (
-        "fmt"
+import (
+    "fmt"
 
-        "github.com/LQR471814/multicast"
-    )
+    "github.com/LQR471814/multicast"
+)
 
-    func main() {
-        //? Get group addr struct
-        group, err := net.ResolveUDPAddr("udp", "224.0.0.1:5001")
-        if err != nil {
-            log.Fatal(err)
-        }
-
-        //? Listen for packet
-        err = multicast.Listen(group, func(packet operations.MulticastPacket) {
-            log.Println(string(packet.Contents))
-        })
-        if err != nil {
-            log.Fatal(err.Error())
-        }
-
-        //? Send to group
-        err = multicast.Ping(group, []byte("Hello world!"))
-        if err != nil {
-            log.Fatal(err.Error())
-            return
-        }
-
-        //? Wait
-        log.Println("Waiting...")
-        <-operations.Context().Done()
+func main() {
+    //? Get group addr struct
+    group, err := net.ResolveUDPAddr("udp", "224.0.0.1:5001")
+    if err != nil {
+        log.Fatal(err)
     }
-    ```
+
+    //? Listen for packet
+    err = multicast.Listen(group, func(packet operations.MulticastPacket) {
+        log.Println(string(packet.Contents))
+    })
+    if err != nil {
+        log.Fatal(err.Error())
+    }
+
+    //? Send to group
+    err = multicast.Ping(group, []byte("Hello world!"))
+    if err != nil {
+        log.Fatal(err.Error())
+        return
+    }
+
+    //? Wait
+    log.Println("Waiting...")
+    <-operations.Context().Done()
+}
+```
 </details>
 
 ### Methods
