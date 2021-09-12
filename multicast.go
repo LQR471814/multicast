@@ -3,7 +3,6 @@ package multicast
 import (
 	"log"
 	"net"
-	"runtime"
 
 	"github.com/LQR471814/multicast/action"
 	"github.com/LQR471814/multicast/common"
@@ -19,63 +18,31 @@ func init() {
 }
 
 func Ping(group *net.UDPAddr, buf []byte) error {
-	pingable, err := Check()
-	if err != nil {
-		return err
-	}
-
-	if !pingable {
+	if store.Current() == store.DefaultStore() {
 		return common.SetupRequired{}
 	}
 
-	err = operations.Ping(group, buf)
+	err := operations.Ping(group, buf)
 	return err
 }
 
 func Listen(group *net.UDPAddr, handler func(operations.MulticastPacket)) error {
-	listenable, err := Check()
-	if err != nil {
-		return err
-	}
-
-	if !listenable {
+	if store.Current() == store.DefaultStore() {
 		return common.SetupRequired{}
 	}
 
-	err = operations.Listen(group, int(store.Current().Interface), handler)
+	err := operations.Listen(group, int(store.Current().Interface), handler)
 	return err
 }
 
-func Check() (bool, error) { //? Returns false if setup is required
-	var result bool
-	var err error
-
-	ctx := common.RuleContext{
-		Interface: store.Current().Interface,
-	}
-
-	switch runtime.GOOS {
-	case "windows":
-		result, err = action.Check(ctx)
-	}
-
-	return result, err
+func IsAdmin() bool {
+	return action.IsAdmin()
 }
 
 func Setup(exec string, intf int) error {
-	switch runtime.GOOS {
-	case "windows":
-		return action.Setup(exec, intf)
-	}
-
-	return nil
+	return action.Setup(exec, intf)
 }
 
 func Reset() error {
-	switch runtime.GOOS {
-	case "windows":
-		return action.Reset(int(store.Current().Interface))
-	}
-
-	return nil
+	return action.Reset(int(store.Current().Interface))
 }
