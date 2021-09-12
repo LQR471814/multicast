@@ -1,7 +1,4 @@
-//go:build windows
-// +build windows
-
-package win
+package action
 
 import (
 	"log"

@@ -5,10 +5,10 @@ import (
 	"net"
 	"runtime"
 
+	"github.com/LQR471814/multicast/action"
 	"github.com/LQR471814/multicast/common"
 	"github.com/LQR471814/multicast/operations"
 	"github.com/LQR471814/multicast/store"
-	"github.com/LQR471814/multicast/win"
 )
 
 func init() {
@@ -56,7 +56,7 @@ func Check() (bool, error) { //? Returns false if setup is required
 
 	switch runtime.GOOS {
 	case "windows":
-		result, err = win.Check(ctx)
+		result, err = action.Check(ctx)
 	}
 
 	return result, err
@@ -65,7 +65,7 @@ func Check() (bool, error) { //? Returns false if setup is required
 func Setup(exec string, intf int) error {
 	switch runtime.GOOS {
 	case "windows":
-		return win.Setup(exec, intf)
+		return action.Setup(exec, intf)
 	}
 
 	return nil
@@ -74,7 +74,7 @@ func Setup(exec string, intf int) error {
 func Reset() error {
 	switch runtime.GOOS {
 	case "windows":
-		return win.Reset(int(store.Current().Interface))
+		return action.Reset(int(store.Current().Interface))
 	}
 
 	return nil
