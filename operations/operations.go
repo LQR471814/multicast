@@ -9,7 +9,7 @@ import (
 	"github.com/LQR471814/multicast/common"
 )
 
-var conn = &net.UDPConn{}
+var pingConn *net.UDPConn
 
 var ctx context.Context
 var cancel context.CancelFunc
@@ -24,7 +24,7 @@ func init() {
 	ctx, cancel = context.WithCancel(context.Background())
 }
 
-func listener(handler func(MulticastPacket)) {
+func listener(conn *net.UDPConn, handler func(MulticastPacket)) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -56,23 +56,28 @@ func Listen(group *net.UDPAddr, intf int, handler func(MulticastPacket)) error {
 		return err
 	}
 
-	conn, err = net.ListenMulticastUDP("udp4", networkInterface, group)
-	if conn == nil {
-		return common.BrokenInterfaceError{}
+	conn, err := net.ListenMulticastUDP("udp4", networkInterface, group)
+	if err != nil {
+		return err
 	}
 
 	conn.SetReadBuffer(common.BUFFER)
-	go listener(handler)
+	go listener(conn, handler)
 
 	return err
 }
 
 func Ping(group *net.UDPAddr, buf []byte) error {
-	if conn == nil {
-		return common.BrokenInterfaceError{}
+	var err error
+
+	if pingConn == nil {
+		pingConn, err = net.DialUDP("udp", nil, group)
+		if err != nil {
+			return err
+		}
 	}
 
-	_, err := conn.WriteToUDP(buf, group)
+	_, err = pingConn.Write(buf)
 	if err != nil {
 		return err
 	}
