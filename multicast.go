@@ -5,12 +5,10 @@ import (
 	"net"
 	"runtime"
 
-	"github.com/LQR471814/multicast/checks"
 	"github.com/LQR471814/multicast/common"
 	"github.com/LQR471814/multicast/operations"
-	"github.com/LQR471814/multicast/reset"
-	"github.com/LQR471814/multicast/setup"
 	"github.com/LQR471814/multicast/store"
+	"github.com/LQR471814/multicast/win"
 )
 
 func init() {
@@ -52,13 +50,13 @@ func Check() (bool, error) { //? Returns false if setup is required
 	var result bool
 	var err error
 
-	ctx := checks.RuleContext{
+	ctx := common.RuleContext{
 		Interface: store.Current().Interface,
 	}
 
 	switch runtime.GOOS {
 	case "windows":
-		result, err = checks.Check_Win(ctx)
+		result, err = win.Check(ctx)
 	}
 
 	return result, err
@@ -67,7 +65,7 @@ func Check() (bool, error) { //? Returns false if setup is required
 func Setup(exec string, intf int) error {
 	switch runtime.GOOS {
 	case "windows":
-		return setup.Win(exec, intf)
+		return win.Setup(exec, intf)
 	}
 
 	return nil
@@ -76,7 +74,7 @@ func Setup(exec string, intf int) error {
 func Reset() error {
 	switch runtime.GOOS {
 	case "windows":
-		return reset.Win(int(store.Current().Interface))
+		return win.Reset(int(store.Current().Interface))
 	}
 
 	return nil

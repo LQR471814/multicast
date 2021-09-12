@@ -1,4 +1,4 @@
-package common
+package win
 
 import (
 	"log"
@@ -6,7 +6,7 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-func Win_IsAdmin() bool {
+func IsAdmin() bool {
 	var sid *windows.SID
 	err := windows.AllocateAndInitializeSid(
 		&windows.SECURITY_NT_AUTHORITY,

@@ -1,13 +1,14 @@
-package setup
+package win
 
 import (
 	"os/exec"
 	"strconv"
 
 	"github.com/LQR471814/multicast/common"
+	"github.com/LQR471814/multicast/store"
 )
 
-func Win_routing_cfg(intf, metric int) ([]byte, error) {
+func routing_setup(intf, metric int) ([]byte, error) {
 	out, err := exec.Command( //? Set route
 		"netsh", "interface",
 		"ipv4", "set", "route",
@@ -21,7 +22,7 @@ func Win_routing_cfg(intf, metric int) ([]byte, error) {
 	return out, err
 }
 
-func Win_firewall_setup(path string) ([]byte, error) {
+func firewall_setup(path string) ([]byte, error) {
 	out, err := exec.Command(
 		"netsh", "advfirewall",
 		"firewall", "add",
@@ -33,4 +34,26 @@ func Win_firewall_setup(path string) ([]byte, error) {
 	).Output()
 
 	return out, err
+}
+
+func Setup(exec string, intf int) error {
+	if !IsAdmin() {
+		return common.MissingPrivileges{}
+	}
+
+	_, err := routing_setup(intf, 1)
+	if err != nil {
+		return err
+	}
+
+	_, err = firewall_setup(exec)
+	if err != nil {
+		return err
+	}
+
+	store.UpdateStore(store.Store{
+		Interface: int64(intf),
+	})
+
+	return nil
 }

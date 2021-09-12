@@ -1,12 +1,17 @@
-package checks
+//go:build windows
+// +build windows
+
+package win
 
 import (
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/LQR471814/multicast/common"
 )
 
-func win_command_failed(err error) bool {
+func command_failed(err error) bool {
 	if err != nil && err.Error() == "exit status 1" {
 		return true
 	}
@@ -14,14 +19,14 @@ func win_command_failed(err error) bool {
 	return false
 }
 
-func win_firewall_check(ctx RuleContext) (bool, error) {
+func firewall_check(ctx common.RuleContext) (bool, error) {
 	err := exec.Command(
 		"powershell.exe",
 		"Get-NetFirewallRule",
 		"-DisplayName \"FTX\"",
 	).Run()
 
-	if win_command_failed(err) {
+	if command_failed(err) {
 		return false, nil
 	} else if err != nil {
 		return false, err
@@ -30,7 +35,7 @@ func win_firewall_check(ctx RuleContext) (bool, error) {
 	return true, nil
 }
 
-func win_routing_check(ctx RuleContext) (bool, error) {
+func routing_check(ctx common.RuleContext) (bool, error) {
 	out, err := exec.Command(
 		"powershell.exe",
 		"Get-NetRoute",
@@ -41,7 +46,7 @@ func win_routing_check(ctx RuleContext) (bool, error) {
 		),
 	).Output()
 
-	if win_command_failed(err) {
+	if command_failed(err) {
 		return false, nil
 	} else if err != nil {
 		return false, err
@@ -61,4 +66,11 @@ func win_routing_check(ctx RuleContext) (bool, error) {
 	}
 
 	return false, nil
+}
+
+func Check(ctx common.RuleContext) (bool, error) {
+	return common.All(ctx, []common.Rule{ //? Returns true if all rules pass
+		firewall_check,
+		routing_check,
+	})
 }

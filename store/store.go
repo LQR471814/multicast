@@ -2,8 +2,8 @@ package store
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/kirsle/configdir"
 )
@@ -36,7 +36,7 @@ func UpdateStore(newStore Store) {
 func LoadStore() error {
 	path := configdir.SystemConfig()[0]
 
-	data, err := os.ReadFile(fmt.Sprintf("%v\\%v", path, StoreFilename))
+	data, err := os.ReadFile(filepath.Join(path, StoreFilename))
 	if os.IsNotExist(err) {
 		UpdateStore(DefaultStore())
 	} else if err != nil {
@@ -59,7 +59,7 @@ func WriteStore() error {
 		return err
 	}
 
-	configDir := fmt.Sprintf("%v\\%v", path, StoreFilename)
+	configDir := filepath.Join(path, StoreFilename)
 
 	f, err := os.Create(configDir)
 	if err != nil {
